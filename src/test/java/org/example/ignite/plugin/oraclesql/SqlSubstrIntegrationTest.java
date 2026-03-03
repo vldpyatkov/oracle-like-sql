@@ -13,7 +13,11 @@ import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SqlSubstrIntegrationTest {
     public static final String DEFAULT_CACHE_NAME = "default";
@@ -53,12 +57,12 @@ public class SqlSubstrIntegrationTest {
     @Test
     public void testSubstr() {
         try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
-            queryAndPrint(ignite,"SELECT SUBSTR('abcdef', 3)");
-            queryAndPrint(ignite,"SELECT SUBSTR('abcdef', 3, 2)");
-            queryAndPrint(ignite,"SELECT SUBSTR('abcdef', -2)");
-            queryAndPrint(ignite,"SELECT SUBSTR('abcdef', 0, 3)");
-            queryAndPrint(ignite,"SELECT SUBSTR('abcdef', -20, 3)");
-            queryAndPrint(ignite,"SELECT SUBSTR('abcdef', 2, 0)");
+            assertEquals("cdef", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 3)").get(0).get(0));
+            assertEquals("cd", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 3, 2)").get(0).get(0));
+            assertEquals("ef", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', -2)").get(0).get(0));
+            assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 0, 3)").get(0).get(0));
+            assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', -20, 3)").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 2, 0)").get(0).get(0));
         }
     }
 

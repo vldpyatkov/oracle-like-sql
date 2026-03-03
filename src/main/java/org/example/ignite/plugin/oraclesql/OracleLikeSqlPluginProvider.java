@@ -117,7 +117,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
 
     /** {@inheritDoc} */
     @Override public CachePluginProvider<?> createCacheProvider(CachePluginContext ctx) {
-        return CACHE_PROVIDER;
+        return null;//CACHE_PROVIDER;
     }
 
     /** {@inheritDoc} */
@@ -175,6 +175,17 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
     @Deprecated
     @Override public void validateNewNode(ClusterNode node) throws PluginValidationException {
         // No-op.
+    }
+
+    /**
+     * Oracle-compatible SUBSTR overload for primitive {@code int} length.
+     *
+     * @param str Source string.
+     * @param pos Start position (1-based, negative values count from the end).
+     * @param len Length.
+     */
+    public static String substr(String str, int pos, int len) {
+        return substr(str, pos, Integer.valueOf(len));
     }
 
     /**
