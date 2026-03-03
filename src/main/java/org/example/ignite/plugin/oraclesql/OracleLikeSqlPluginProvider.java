@@ -2,7 +2,6 @@ package org.example.ignite.plugin.oraclesql;
 
 import java.io.Serializable;
 import java.util.UUID;
-import javax.cache.Cache;
 import org.apache.calcite.adapter.enumerable.NullPolicy;
 import org.apache.calcite.linq4j.tree.Expressions;
 import org.apache.calcite.sql.SqlFunction;
@@ -16,10 +15,8 @@ import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.Frameworks;
 import org.apache.ignite.IgniteCheckedException;
 import org.apache.ignite.cluster.ClusterNode;
-import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.internal.processors.query.calcite.CalciteQueryProcessor;
 import org.apache.ignite.internal.processors.query.calcite.exec.exp.RexImpTable;
-import org.apache.ignite.plugin.CachePluginConfiguration;
 import org.apache.ignite.plugin.CachePluginContext;
 import org.apache.ignite.plugin.CachePluginProvider;
 import org.apache.ignite.plugin.ExtensionRegistry;
@@ -37,41 +34,6 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
     /** Empty plugin instance required by Ignite plugin processor. */
     private static final IgnitePlugin PLUGIN = new IgnitePlugin() {
         // No-op.
-    };
-
-    /** Empty cache plugin provider. */
-    private static final CachePluginProvider<?> CACHE_PROVIDER = new CachePluginProvider<CachePluginConfiguration>() {
-        @Override public void start() {
-            // No-op.
-        }
-
-        @Override public void stop(boolean cancel) {
-            // No-op.
-        }
-
-        @Override public void onIgniteStart() {
-            // No-op.
-        }
-
-        @Override public void onIgniteStop(boolean cancel) {
-            // No-op.
-        }
-
-        @Nullable @Override public <T> T createComponent(Class<T> cls) {
-            return null;
-        }
-
-        @Nullable @Override public <T, K, V> T unwrapCacheEntry(Cache.Entry<K, V> entry, Class<T> cls) {
-            return null;
-        }
-
-        @Override public void validate() {
-            // No-op.
-        }
-
-        @Override public void validateRemote(CacheConfiguration locCfg, CacheConfiguration rmtCfg, ClusterNode rmtNode) {
-            // No-op.
-        }
     };
 
     /** {@inheritDoc} */
@@ -117,7 +79,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
 
     /** {@inheritDoc} */
     @Override public CachePluginProvider<?> createCacheProvider(CachePluginContext ctx) {
-        return null;//CACHE_PROVIDER;
+        return null;
     }
 
     /** {@inheritDoc} */
