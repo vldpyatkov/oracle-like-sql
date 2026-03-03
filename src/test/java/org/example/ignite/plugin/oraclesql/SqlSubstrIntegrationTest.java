@@ -4,8 +4,11 @@ import java.util.List;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.cache.query.SqlFieldsQuery;
+import org.apache.ignite.calcite.CalciteQueryEngineConfiguration;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.configuration.SqlConfiguration;
+import org.apache.ignite.spi.communication.tcp.TcpCommunicationSpi;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import org.apache.logging.log4j.LogManager;
@@ -21,9 +24,16 @@ public class SqlSubstrIntegrationTest {
         return new IgniteConfiguration()
             .setIgniteInstanceName(nodeName)
             .setConsistentId(nodeName)
-            .setCacheConfiguration(new CacheConfiguration(DEFAULT_CACHE_NAME))
+            .setCacheConfiguration(new CacheConfiguration(DEFAULT_CACHE_NAME)
+                .setSqlSchema("PUBLIC"))
             .setPeerClassLoadingEnabled(false)
             .setConnectorConfiguration(null)
+            .setSqlConfiguration(new SqlConfiguration()
+                .setQueryEnginesConfiguration(new CalciteQueryEngineConfiguration()))
+            .setCommunicationSpi(new TcpCommunicationSpi()
+                .setLocalAddress("127.0.0.1")
+                .setLocalPort(47100)
+                .setLocalPortRange(5))
             .setDiscoverySpi(new TcpDiscoverySpi()
                 .setLocalAddress("127.0.0.1")
                 .setLocalPort(47500)

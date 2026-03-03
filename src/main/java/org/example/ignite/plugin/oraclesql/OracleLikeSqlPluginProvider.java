@@ -34,6 +34,11 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
     /** Extended operator table. */
     private static final OracleLikeSqlOperatorTable OPERATOR_TABLE = new OracleLikeSqlOperatorTable();
 
+    /** Empty plugin instance required by Ignite plugin processor. */
+    private static final IgnitePlugin PLUGIN = new IgnitePlugin() {
+        // No-op.
+    };
+
     /** Empty cache plugin provider. */
     private static final CachePluginProvider<?> CACHE_PROVIDER = new CachePluginProvider<CachePluginConfiguration>() {
         @Override public void start() {
@@ -86,7 +91,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
 
     /** {@inheritDoc} */
     @Override public <T extends IgnitePlugin> T plugin() {
-        return null;
+        return (T)PLUGIN;
     }
 
     /** {@inheritDoc} */
@@ -176,7 +181,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
      * Oracle-compatible SUBSTR implementation.
      *
      * @param str Source string.
-     * @param pos Start position (1-based, negative values count from the end, 0 is treated as 1).
+     * @param pos Start position (1-based, negative values count from the end).
      * @param len Optional length.
      * @return Extracted substring or {@code null}.
      */
