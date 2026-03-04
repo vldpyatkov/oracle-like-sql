@@ -5,6 +5,7 @@ import org.apache.calcite.sql.SqlFunctionCategory;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
+import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable;
 
@@ -43,7 +44,7 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         OperandTypes.or(
             OperandTypes.STRING_STRING,
             OperandTypes.STRING_STRING_INTEGER,
-            OperandTypes.family(SqlTypeName.CHARACTER, SqlTypeName.CHARACTER, SqlTypeName.INTEGER, SqlTypeName.CHARACTER)
+            OperandTypes.family(SqlTypeFamily.CHARACTER, SqlTypeFamily.CHARACTER, SqlTypeFamily.INTEGER, SqlTypeFamily.CHARACTER)
         ),
         SqlFunctionCategory.STRING
     );
