@@ -1,5 +1,6 @@
 package org.example.ignite.plugin.oraclesql;
 
+import java.time.OffsetDateTime;
 import org.jetbrains.annotations.Nullable;
 
 public class SqlFunctions {
@@ -50,4 +51,12 @@ public class SqlFunctions {
         return str.substring(startPos, endPos);
     }
 
+    /**
+     * Oracle-compatible SYSTIMESTAMP implementation.
+     *
+     * @return Current timestamp with local time zone offset.
+     */
+    public static OffsetDateTime systimestamp() {
+        return OffsetDateTime.now();
+    }
 }

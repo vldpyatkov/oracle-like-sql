@@ -100,6 +100,13 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 );
             }, NullPolicy.ARG0, false)
         );
+        RexImpTable.INSTANCE.define(
+            OracleLikeSqlOperatorTable.SYSTIMESTAMP,
+            RexImpTable.createRexCallImplementor((translator, call, translatedOperands) ->
+                    Expressions.call(SqlFunctions.class, "systimestamp"),
+                NullPolicy.NONE,
+                false)
+        );
     }
 
     /** {@inheritDoc} */
