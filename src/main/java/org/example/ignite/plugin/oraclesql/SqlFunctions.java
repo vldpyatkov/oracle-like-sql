@@ -218,6 +218,19 @@ public class SqlFunctions {
         throw new IllegalArgumentException("Unsupported ADD_MONTHS DATE argument type: " + date.getClass());
     }
 
+    /** Oracle-compatible ADD_MONTHS for Calcite DATE as days since epoch (primitive). */
+    public static Date addMonthsDate(int date, int months) {
+        return addMonths(Date.valueOf(LocalDate.ofEpochDay(date)), months);
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite DATE as days since epoch. */
+    public static Date addMonthsDate(int date, Integer months) {
+        if (months == null)
+            return null;
+
+        return addMonthsDate(date, months.intValue());
+    }
+
     /**
      * Oracle-compatible ADD_MONTHS implementation for primitive month argument.
      */
@@ -242,6 +255,19 @@ public class SqlFunctions {
             return addMonths(new Timestamp(((Number)ts).longValue()), months);
 
         throw new IllegalArgumentException("Unsupported ADD_MONTHS TIMESTAMP argument type: " + ts.getClass());
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite TIMESTAMP as millis since epoch (primitive). */
+    public static Timestamp addMonthsTimestamp(long ts, int months) {
+        return addMonths(new Timestamp(ts), months);
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite TIMESTAMP as millis since epoch. */
+    public static Timestamp addMonthsTimestamp(long ts, Integer months) {
+        if (months == null)
+            return null;
+
+        return addMonthsTimestamp(ts, months.intValue());
     }
 
     /**
