@@ -5,9 +5,10 @@ import org.apache.calcite.sql.SqlFunctionCategory;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
+import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable;
 
-public class OracleLikeSqlOperatorTable  extends ReflectiveSqlOperatorTable {
+public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
     /** Oracle-compatible SUBSTR function. */
     public static final SqlFunction SUBSTR = new SqlFunction(
         "SUBSTR",
@@ -16,5 +17,20 @@ public class OracleLikeSqlOperatorTable  extends ReflectiveSqlOperatorTable {
         null,
         OperandTypes.or(OperandTypes.STRING_INTEGER, OperandTypes.STRING_INTEGER_INTEGER),
         SqlFunctionCategory.STRING
+    );
+
+    /**
+     * Oracle-compatible SYSTIMESTAMP function.
+     *
+     * <p>Ignite 2 does not support TIMESTAMP WITH LOCAL TIME ZONE type,
+     * therefore this function is exposed as plain TIMESTAMP.</p>
+     */
+    public static final SqlFunction SYSTIMESTAMP = new SqlFunction(
+        "SYSTIMESTAMP",
+        SqlKind.OTHER_FUNCTION,
+        ReturnTypes.explicit(SqlTypeName.TIMESTAMP),
+        null,
+        OperandTypes.NILADIC,
+        SqlFunctionCategory.TIMEDATE
     );
 }

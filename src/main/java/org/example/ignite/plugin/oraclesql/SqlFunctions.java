@@ -1,5 +1,6 @@
 package org.example.ignite.plugin.oraclesql;
 
+import java.sql.Timestamp;
 import org.jetbrains.annotations.Nullable;
 
 public class SqlFunctions {
@@ -50,4 +51,12 @@ public class SqlFunctions {
         return str.substring(startPos, endPos);
     }
 
+    /**
+     * Oracle-compatible SYSTIMESTAMP implementation mapped to Ignite TIMESTAMP.
+     *
+     * @return Current timestamp.
+     */
+    public static Timestamp systimestamp() {
+        return new Timestamp(System.currentTimeMillis());
+    }
 }

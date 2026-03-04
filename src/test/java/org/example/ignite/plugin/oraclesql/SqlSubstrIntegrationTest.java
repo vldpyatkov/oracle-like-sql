@@ -1,5 +1,6 @@
 package org.example.ignite.plugin.oraclesql;
 
+import java.sql.Timestamp;
 import java.util.List;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
@@ -16,6 +17,8 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 
 public class SqlSubstrIntegrationTest {
@@ -62,6 +65,21 @@ public class SqlSubstrIntegrationTest {
             assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 0, 3)").get(0).get(0));
             assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', -20, 3)").get(0).get(0));
             assertNull(queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 2, 0)").get(0).get(0));
+        }
+    }
+
+    /** Verifies Oracle-compatible SYSTIMESTAMP behavior. */
+    @Test
+    public void testSystimestamp() {
+        try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
+            Object first = queryAndPrint(ignite, "SELECT SYSTIMESTAMP").get(0).get(0);
+            Object second = queryAndPrint(ignite, "SELECT SYSTIMESTAMP").get(0).get(0);
+
+            assertNotNull(first);
+            assertNotNull(second);
+            assertTrue(first instanceof Timestamp);
+            assertTrue(second instanceof Timestamp);
+            assertTrue(!((Timestamp)second).before((Timestamp)first));
         }
     }
 
