@@ -87,8 +87,8 @@ public class SqlSubstrIntegrationTest {
     @Test
     public void testSystimestamp() {
         try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
-            Object first = queryAndPrint(ignite, "SELECT SYSTIMESTAMP").get(0).get(0);
-            Object second = queryAndPrint(ignite, "SELECT SYSTIMESTAMP").get(0).get(0);
+            Object first = queryAndPrint(ignite, "SELECT SYSTIMESTAMP()").get(0).get(0);
+            Object second = queryAndPrint(ignite, "SELECT SYSTIMESTAMP()").get(0).get(0);
 
             assertNotNull(first);
             assertNotNull(second);
