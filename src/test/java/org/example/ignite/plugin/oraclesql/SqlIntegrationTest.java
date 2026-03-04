@@ -18,14 +18,15 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class SqlSubstrIntegrationTest {
+public class SqlIntegrationTest {
     public static final String DEFAULT_CACHE_NAME = "default";
 
-    private static final Logger LOG = LogManager.getLogger(SqlSubstrIntegrationTest.class);
+    private static final Logger LOG = LogManager.getLogger(SqlIntegrationTest.class);
 
     private IgniteConfiguration createConfiguration(String nodeName) {
         return new IgniteConfiguration()
@@ -95,7 +96,7 @@ public class SqlSubstrIntegrationTest {
             assertNotNull(second);
             assertTrue(first instanceof Timestamp);
             assertTrue(second instanceof Timestamp);
-            assertTrue(!((Timestamp)second).before((Timestamp)first));
+            assertFalse(((Timestamp)second).before((Timestamp)first));
         }
     }
 

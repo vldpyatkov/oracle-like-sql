@@ -7,6 +7,7 @@ import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
 import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.calcite.sql.type.SqlTypeTransforms;
 import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable;
 
 public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
@@ -39,7 +40,7 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
     public static final SqlFunction ADD_MONTHS = new SqlFunction(
         "ADD_MONTHS",
         SqlKind.OTHER_FUNCTION,
-        ReturnTypes.cascade(ReturnTypes.ARG0, ReturnTypes.TO_NULLABLE),
+        ReturnTypes.cascade(ReturnTypes.ARG0, SqlTypeTransforms.TO_NULLABLE),
         null,
         OperandTypes.or(
             OperandTypes.family(SqlTypeFamily.DATE, SqlTypeFamily.INTEGER),
