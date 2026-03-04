@@ -35,6 +35,19 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         SqlFunctionCategory.TIMEDATE
     );
 
+    /** Oracle-compatible ADD_MONTHS function. */
+    public static final SqlFunction ADD_MONTHS = new SqlFunction(
+        "ADD_MONTHS",
+        SqlKind.OTHER_FUNCTION,
+        ReturnTypes.cascade(ReturnTypes.ARG0, ReturnTypes.TO_NULLABLE),
+        null,
+        OperandTypes.or(
+            OperandTypes.family(SqlTypeFamily.DATE, SqlTypeFamily.INTEGER),
+            OperandTypes.family(SqlTypeFamily.TIMESTAMP, SqlTypeFamily.INTEGER)
+        ),
+        SqlFunctionCategory.TIMEDATE
+    );
+
     /** Oracle-compatible REGEXP_COUNT function. */
     public static final SqlFunction REGEXP_COUNT = new SqlFunction(
         "REGEXP_COUNT",

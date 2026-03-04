@@ -1,6 +1,9 @@
 package org.example.ignite.plugin.oraclesql;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
@@ -154,5 +157,69 @@ public class SqlFunctions {
      */
     public static Timestamp systimestamp() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for DATE.
+     *
+     * @param date Source date.
+     * @param months Number of months to add (can be negative).
+     * @return Shifted date or {@code null} when any argument is {@code null}.
+     */
+    public static Date addMonths(Date date, Integer months) {
+        if (date == null || months == null)
+            return null;
+
+        LocalDate source = date.toLocalDate();
+
+        return Date.valueOf(addMonthsInternal(source, months));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for TIMESTAMP.
+     *
+     * @param ts Source timestamp.
+     * @param months Number of months to add (can be negative).
+     * @return Shifted timestamp or {@code null} when any argument is {@code null}.
+     */
+    public static Timestamp addMonths(Timestamp ts, Integer months) {
+        if (ts == null || months == null)
+            return null;
+
+        LocalDateTime source = ts.toLocalDateTime();
+        LocalDate shiftedDate = addMonthsInternal(source.toLocalDate(), months);
+
+        return Timestamp.valueOf(LocalDateTime.of(shiftedDate, source.toLocalTime()));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for primitive month argument.
+     */
+    public static Date addMonths(Date date, int months) {
+        return addMonths(date, Integer.valueOf(months));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for primitive month argument.
+     */
+    public static Timestamp addMonths(Timestamp ts, int months) {
+        return addMonths(ts, Integer.valueOf(months));
+    }
+
+    /**
+     * Applies Oracle month-shift rules:
+     * if source date is month end, result is target month end;
+     * if target month is shorter than source day, result is target month end.
+     */
+    private static LocalDate addMonthsInternal(LocalDate source, int months) {
+        LocalDate target = source.plusMonths(months);
+
+        if (source.getDayOfMonth() == source.lengthOfMonth())
+            return target.withDayOfMonth(target.lengthOfMonth());
+
+        if (source.getDayOfMonth() > target.lengthOfMonth())
+            return target.withDayOfMonth(target.lengthOfMonth());
+
+        return target.withDayOfMonth(source.getDayOfMonth());
     }
 }
