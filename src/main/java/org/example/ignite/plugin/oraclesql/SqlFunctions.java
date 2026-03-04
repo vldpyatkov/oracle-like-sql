@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
@@ -252,14 +253,17 @@ public class SqlFunctions {
             return addMonths((Timestamp)ts, months);
 
         if (ts instanceof Number)
-            return addMonths(new Timestamp(((Number)ts).longValue()), months);
+            return addMonthsTimestamp(((Number)ts).longValue(), months);
 
         throw new IllegalArgumentException("Unsupported ADD_MONTHS TIMESTAMP argument type: " + ts.getClass());
     }
 
     /** Oracle-compatible ADD_MONTHS for Calcite TIMESTAMP as millis since epoch (primitive). */
     public static Timestamp addMonthsTimestamp(long ts, int months) {
-        return addMonths(new Timestamp(ts), months);
+        LocalDateTime source = LocalDateTime.of(1970, 1, 1, 0, 0).plus(ts, ChronoUnit.MILLIS);
+        LocalDate shiftedDate = addMonthsInternal(source.toLocalDate(), months);
+
+        return Timestamp.valueOf(LocalDateTime.of(shiftedDate, source.toLocalTime()));
     }
 
     /** Oracle-compatible ADD_MONTHS for Calcite TIMESTAMP as millis since epoch. */
