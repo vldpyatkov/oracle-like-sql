@@ -18,8 +18,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SqlSubstrIntegrationTest {
     public static final String DEFAULT_CACHE_NAME = "default";
@@ -65,6 +65,7 @@ public class SqlSubstrIntegrationTest {
             assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 0, 3)").get(0).get(0));
             assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', -20, 3)").get(0).get(0));
             assertNull(queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 2, 0)").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT SUBSTR(NULL, 2)").get(0).get(0));
         }
     }
 

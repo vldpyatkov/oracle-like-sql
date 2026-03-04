@@ -81,11 +81,13 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
         RexImpTable.INSTANCE.define(
             OracleLikeSqlOperatorTable.SUBSTR,
             RexImpTable.createRexCallImplementor((translator, call, translatedOperands) -> {
+                var str = Expressions.convert_(translatedOperands.get(0), String.class);
+
                 if (translatedOperands.size() == 2) {
                     return Expressions.call(
                         SqlFunctions.class,
                         "substr",
-                        translatedOperands.get(0),
+                        str,
                         translatedOperands.get(1),
                         Expressions.constant(null, Integer.class)
                     );
@@ -94,7 +96,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 return Expressions.call(
                     SqlFunctions.class,
                     "substr",
-                    translatedOperands.get(0),
+                    str,
                     translatedOperands.get(1),
                     translatedOperands.get(2)
                 );
@@ -103,12 +105,15 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
         RexImpTable.INSTANCE.define(
             OracleLikeSqlOperatorTable.REGEXP_COUNT,
             RexImpTable.createRexCallImplementor((translator, call, translatedOperands) -> {
+                var source = Expressions.convert_(translatedOperands.get(0), String.class);
+                var pattern = Expressions.convert_(translatedOperands.get(1), String.class);
+
                 if (translatedOperands.size() == 2) {
                     return Expressions.call(
                         SqlFunctions.class,
                         "regexpCount",
-                        translatedOperands.get(0),
-                        translatedOperands.get(1)
+                        source,
+                        pattern
                     );
                 }
 
@@ -116,8 +121,8 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                     return Expressions.call(
                         SqlFunctions.class,
                         "regexpCount",
-                        translatedOperands.get(0),
-                        translatedOperands.get(1),
+                        source,
+                        pattern,
                         translatedOperands.get(2)
                     );
                 }
@@ -125,8 +130,8 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 return Expressions.call(
                     SqlFunctions.class,
                     "regexpCount",
-                    translatedOperands.get(0),
-                    translatedOperands.get(1),
+                    source,
+                    pattern,
                     translatedOperands.get(2),
                     translatedOperands.get(3)
                 );
