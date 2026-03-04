@@ -4,12 +4,6 @@ import java.io.Serializable;
 import java.util.UUID;
 import org.apache.calcite.adapter.enumerable.NullPolicy;
 import org.apache.calcite.linq4j.tree.Expressions;
-import org.apache.calcite.sql.SqlFunction;
-import org.apache.calcite.sql.SqlFunctionCategory;
-import org.apache.calcite.sql.SqlKind;
-import org.apache.calcite.sql.type.OperandTypes;
-import org.apache.calcite.sql.type.ReturnTypes;
-import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable;
 import org.apache.calcite.sql.util.SqlOperatorTables;
 import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.Frameworks;
@@ -89,7 +83,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
             RexImpTable.createRexCallImplementor((translator, call, translatedOperands) -> {
                 if (translatedOperands.size() == 2) {
                     return Expressions.call(
-                        OracleLikeSqlPluginProvider.class,
+                        SqlFunctions.class,
                         "substr",
                         translatedOperands.get(0),
                         translatedOperands.get(1),
@@ -98,7 +92,7 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 }
 
                 return Expressions.call(
-                    OracleLikeSqlPluginProvider.class,
+                    SqlFunctions.class,
                     "substr",
                     translatedOperands.get(0),
                     translatedOperands.get(1),
@@ -137,65 +131,5 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
     @Deprecated
     @Override public void validateNewNode(ClusterNode node) throws PluginValidationException {
         // No-op.
-    }
-
-    /**
-     * Oracle-compatible SUBSTR overload for primitive {@code int} length.
-     *
-     * @param str Source string.
-     * @param pos Start position (1-based, negative values count from the end).
-     * @param len Length.
-     */
-    public static String substr(String str, int pos, int len) {
-        return substr(str, pos, Integer.valueOf(len));
-    }
-
-    /**
-     * Oracle-compatible SUBSTR implementation.
-     *
-     * @param str Source string.
-     * @param pos Start position (1-based, negative values count from the end).
-     * @param len Optional length.
-     * @return Extracted substring or {@code null}.
-     */
-    public static String substr(String str, int pos, @Nullable Integer len) {
-        if (str == null)
-            return null;
-
-        if (len != null && len < 1)
-            return null;
-
-        int strLen = str.length();
-
-        int startPos = pos > 0 ? pos - 1 : strLen + pos;
-
-        if (pos == 0)
-            startPos = 0;
-
-        if (startPos < 0)
-            startPos = 0;
-
-        if (startPos >= strLen)
-            return "";
-
-        int endPos = len == null ? strLen : Math.min(strLen, startPos + len);
-
-        if (endPos <= startPos)
-            return null;
-
-        return str.substring(startPos, endPos);
-    }
-
-    /** Operator table with Oracle-like functions. */
-    public static class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
-        /** Oracle-compatible SUBSTR function. */
-        public static final SqlFunction SUBSTR = new SqlFunction(
-            "SUBSTR",
-            SqlKind.OTHER_FUNCTION,
-            ReturnTypes.ARG0_NULLABLE_VARYING,
-            null,
-            OperandTypes.or(OperandTypes.STRING_INTEGER, OperandTypes.STRING_INTEGER_INTEGER),
-            SqlFunctionCategory.STRING
-        );
     }
 }
