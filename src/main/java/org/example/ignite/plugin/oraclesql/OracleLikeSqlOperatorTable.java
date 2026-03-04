@@ -5,6 +5,7 @@ import org.apache.calcite.sql.SqlFunctionCategory;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
+import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable;
 
@@ -32,5 +33,19 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         null,
         OperandTypes.NILADIC,
         SqlFunctionCategory.TIMEDATE
+    );
+
+    /** Oracle-compatible REGEXP_COUNT function. */
+    public static final SqlFunction REGEXP_COUNT = new SqlFunction(
+        "REGEXP_COUNT",
+        SqlKind.OTHER_FUNCTION,
+        ReturnTypes.INTEGER_NULLABLE,
+        null,
+        OperandTypes.or(
+            OperandTypes.STRING_STRING,
+            OperandTypes.STRING_STRING_INTEGER,
+            OperandTypes.family(SqlTypeFamily.CHARACTER, SqlTypeFamily.CHARACTER, SqlTypeFamily.INTEGER, SqlTypeFamily.CHARACTER)
+        ),
+        SqlFunctionCategory.STRING
     );
 }

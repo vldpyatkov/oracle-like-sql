@@ -18,8 +18,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SqlSubstrIntegrationTest {
     public static final String DEFAULT_CACHE_NAME = "default";
@@ -65,6 +65,21 @@ public class SqlSubstrIntegrationTest {
             assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 0, 3)").get(0).get(0));
             assertEquals("abc", queryAndPrint(ignite, "SELECT SUBSTR('abcdef', -20, 3)").get(0).get(0));
             assertNull(queryAndPrint(ignite, "SELECT SUBSTR('abcdef', 2, 0)").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT SUBSTR(NULL, 2)").get(0).get(0));
+        }
+    }
+
+    /** Verifies Oracle-compatible REGEXP_COUNT behavior. */
+    @Test
+    public void testRegexpCount() {
+        try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
+            assertEquals(2, queryAndPrint(ignite, "SELECT REGEXP_COUNT('abcabc', 'a')").get(0).get(0));
+            assertEquals(1, queryAndPrint(ignite, "SELECT REGEXP_COUNT('abcabc', 'a', 3)").get(0).get(0));
+            assertEquals(3, queryAndPrint(ignite, "SELECT REGEXP_COUNT('AaA', 'a', 1, 'i')").get(0).get(0));
+            assertEquals(1, queryAndPrint(ignite, "SELECT REGEXP_COUNT('AaA', 'a', 1, 'ic')").get(0).get(0));
+            assertEquals(0, queryAndPrint(ignite, "SELECT REGEXP_COUNT('abc', 'z')").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT REGEXP_COUNT(NULL, 'a')").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT REGEXP_COUNT('abc', NULL)").get(0).get(0));
         }
     }
 
