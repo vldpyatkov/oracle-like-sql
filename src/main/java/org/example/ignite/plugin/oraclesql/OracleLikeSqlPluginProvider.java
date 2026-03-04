@@ -101,6 +101,38 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
             }, NullPolicy.ARG0, false)
         );
         RexImpTable.INSTANCE.define(
+            OracleLikeSqlOperatorTable.REGEXP_COUNT,
+            RexImpTable.createRexCallImplementor((translator, call, translatedOperands) -> {
+                if (translatedOperands.size() == 2) {
+                    return Expressions.call(
+                        SqlFunctions.class,
+                        "regexpCount",
+                        translatedOperands.get(0),
+                        translatedOperands.get(1)
+                    );
+                }
+
+                if (translatedOperands.size() == 3) {
+                    return Expressions.call(
+                        SqlFunctions.class,
+                        "regexpCount",
+                        translatedOperands.get(0),
+                        translatedOperands.get(1),
+                        translatedOperands.get(2)
+                    );
+                }
+
+                return Expressions.call(
+                    SqlFunctions.class,
+                    "regexpCount",
+                    translatedOperands.get(0),
+                    translatedOperands.get(1),
+                    translatedOperands.get(2),
+                    translatedOperands.get(3)
+                );
+            }, NullPolicy.ARG0, false)
+        );
+        RexImpTable.INSTANCE.define(
             OracleLikeSqlOperatorTable.SYSTIMESTAMP,
             RexImpTable.createRexCallImplementor((translator, call, translatedOperands) ->
                     Expressions.call(SqlFunctions.class, "systimestamp"),

@@ -33,4 +33,18 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         OperandTypes.NILADIC,
         SqlFunctionCategory.TIMEDATE
     );
+
+    /** Oracle-compatible REGEXP_COUNT function. */
+    public static final SqlFunction REGEXP_COUNT = new SqlFunction(
+        "REGEXP_COUNT",
+        SqlKind.OTHER_FUNCTION,
+        ReturnTypes.INTEGER_NULLABLE,
+        null,
+        OperandTypes.or(
+            OperandTypes.STRING_STRING,
+            OperandTypes.STRING_STRING_INTEGER,
+            OperandTypes.family(SqlTypeName.CHARACTER, SqlTypeName.CHARACTER, SqlTypeName.INTEGER, SqlTypeName.CHARACTER)
+        ),
+        SqlFunctionCategory.STRING
+    );
 }

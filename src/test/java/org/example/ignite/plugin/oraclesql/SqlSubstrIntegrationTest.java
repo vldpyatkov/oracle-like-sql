@@ -68,6 +68,20 @@ public class SqlSubstrIntegrationTest {
         }
     }
 
+    /** Verifies Oracle-compatible REGEXP_COUNT behavior. */
+    @Test
+    public void testRegexpCount() {
+        try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
+            assertEquals(2, queryAndPrint(ignite, "SELECT REGEXP_COUNT('abcabc', 'a')").get(0).get(0));
+            assertEquals(1, queryAndPrint(ignite, "SELECT REGEXP_COUNT('abcabc', 'a', 3)").get(0).get(0));
+            assertEquals(3, queryAndPrint(ignite, "SELECT REGEXP_COUNT('AaA', 'a', 1, 'i')").get(0).get(0));
+            assertEquals(1, queryAndPrint(ignite, "SELECT REGEXP_COUNT('AaA', 'a', 1, 'ic')").get(0).get(0));
+            assertEquals(0, queryAndPrint(ignite, "SELECT REGEXP_COUNT('abc', 'z')").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT REGEXP_COUNT(NULL, 'a')").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT REGEXP_COUNT('abc', NULL)").get(0).get(0));
+        }
+    }
+
     /** Verifies Oracle-compatible SYSTIMESTAMP behavior. */
     @Test
     public void testSystimestamp() {
