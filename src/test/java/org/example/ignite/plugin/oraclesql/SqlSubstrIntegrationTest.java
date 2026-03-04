@@ -1,6 +1,6 @@
 package org.example.ignite.plugin.oraclesql;
 
-import java.time.OffsetDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
@@ -77,9 +77,9 @@ public class SqlSubstrIntegrationTest {
 
             assertNotNull(first);
             assertNotNull(second);
-            assertTrue(first instanceof OffsetDateTime);
-            assertTrue(second instanceof OffsetDateTime);
-            assertTrue(!((OffsetDateTime)second).isBefore((OffsetDateTime)first));
+            assertTrue(first instanceof Timestamp);
+            assertTrue(second instanceof Timestamp);
+            assertTrue(!((Timestamp)second).before((Timestamp)first));
         }
     }
 
