@@ -102,6 +102,31 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 );
             }, NullPolicy.ARG0, false)
         );
+
+        RexImpTable.INSTANCE.define(
+            OracleLikeSqlOperatorTable.ADD_MONTHS,
+            RexImpTable.createRexCallImplementor((translator, call, translatedOperands) -> {
+                var source = translatedOperands.get(0);
+                var months = translatedOperands.get(1);
+
+                if (call.getType().getSqlTypeName() == org.apache.calcite.sql.type.SqlTypeName.TIMESTAMP) {
+                    return Expressions.call(
+                        SqlFunctions.class,
+                        "addMonthsTimestamp",
+                        source,
+                        months
+                    );
+                }
+
+                return Expressions.call(
+                    SqlFunctions.class,
+                    "addMonthsDate",
+                    source,
+                    months
+                );
+            }, NullPolicy.STRICT, false)
+        );
+
         RexImpTable.INSTANCE.define(
             OracleLikeSqlOperatorTable.REGEXP_COUNT,
             RexImpTable.createRexCallImplementor((translator, call, translatedOperands) -> {

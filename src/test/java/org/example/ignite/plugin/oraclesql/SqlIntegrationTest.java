@@ -1,5 +1,6 @@
 package org.example.ignite.plugin.oraclesql;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.ignite.Ignite;
@@ -17,14 +18,15 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class SqlSubstrIntegrationTest {
+public class SqlIntegrationTest {
     public static final String DEFAULT_CACHE_NAME = "default";
 
-    private static final Logger LOG = LogManager.getLogger(SqlSubstrIntegrationTest.class);
+    private static final Logger LOG = LogManager.getLogger(SqlIntegrationTest.class);
 
     private IgniteConfiguration createConfiguration(String nodeName) {
         return new IgniteConfiguration()
@@ -94,7 +96,29 @@ public class SqlSubstrIntegrationTest {
             assertNotNull(second);
             assertTrue(first instanceof Timestamp);
             assertTrue(second instanceof Timestamp);
-            assertTrue(!((Timestamp)second).before((Timestamp)first));
+            assertFalse(((Timestamp)second).before((Timestamp)first));
+        }
+    }
+
+
+    /** Verifies Oracle-compatible ADD_MONTHS behavior. */
+    @Test
+    public void testAddMonths() {
+        try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
+            assertEquals(Date.valueOf("2024-02-29"), queryAndPrint(ignite,
+                "SELECT ADD_MONTHS(DATE '2024-01-31', 1)").get(0).get(0));
+            assertEquals(Date.valueOf("2023-02-28"), queryAndPrint(ignite,
+                "SELECT ADD_MONTHS(DATE '2023-03-30', -1)").get(0).get(0));
+            assertEquals(Date.valueOf("2024-03-15"), queryAndPrint(ignite,
+                "SELECT ADD_MONTHS(DATE '2024-01-15', 2)").get(0).get(0));
+            assertNull(queryAndPrint(ignite, "SELECT ADD_MONTHS(CAST(NULL AS DATE), 1)").get(0).get(0));
+
+            Object ts = queryAndPrint(ignite,
+                "SELECT ADD_MONTHS(TIMESTAMP '2023-01-31 10:15:30', 1)").get(0).get(0);
+
+            assertTrue(ts instanceof Timestamp);
+            assertEquals(Timestamp.valueOf("2023-02-28 10:15:30"), ts);
+            assertNull(queryAndPrint(ignite, "SELECT ADD_MONTHS(CAST(NULL AS TIMESTAMP), 1)").get(0).get(0));
         }
     }
 

@@ -1,6 +1,10 @@
 package org.example.ignite.plugin.oraclesql;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
@@ -154,5 +158,136 @@ public class SqlFunctions {
      */
     public static Timestamp systimestamp() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for DATE.
+     *
+     * @param date Source date.
+     * @param months Number of months to add (can be negative).
+     * @return Shifted date or {@code null} when any argument is {@code null}.
+     */
+    public static Date addMonths(Date date, Integer months) {
+        if (date == null || months == null)
+            return null;
+
+        LocalDate source = date.toLocalDate();
+
+        return Date.valueOf(addMonthsInternal(source, months));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for TIMESTAMP.
+     *
+     * @param ts Source timestamp.
+     * @param months Number of months to add (can be negative).
+     * @return Shifted timestamp or {@code null} when any argument is {@code null}.
+     */
+    public static Timestamp addMonths(Timestamp ts, Integer months) {
+        if (ts == null || months == null)
+            return null;
+
+        LocalDateTime source = ts.toLocalDateTime();
+        LocalDate shiftedDate = addMonthsInternal(source.toLocalDate(), months);
+
+        return Timestamp.valueOf(LocalDateTime.of(shiftedDate, source.toLocalTime()));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for primitive month argument.
+     */
+    public static Date addMonths(Date date, int months) {
+        return addMonths(date, Integer.valueOf(months));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for Calcite internal DATE representation.
+     *
+     * <p>Calcite may pass DATE values as days since epoch ({@code int}/{@code Integer})
+     * instead of {@link Date} objects.
+     */
+    public static Date addMonthsDate(Object date, Integer months) {
+        if (date == null || months == null)
+            return null;
+
+        if (date instanceof Date)
+            return addMonths((Date)date, months);
+
+        if (date instanceof Number)
+            return addMonths(Date.valueOf(LocalDate.ofEpochDay(((Number)date).longValue())), months);
+
+        throw new IllegalArgumentException("Unsupported ADD_MONTHS DATE argument type: " + date.getClass());
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite DATE as days since epoch (primitive). */
+    public static Date addMonthsDate(int date, int months) {
+        return addMonths(Date.valueOf(LocalDate.ofEpochDay(date)), months);
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite DATE as days since epoch. */
+    public static Date addMonthsDate(int date, Integer months) {
+        if (months == null)
+            return null;
+
+        return addMonthsDate(date, months.intValue());
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for primitive month argument.
+     */
+    public static Timestamp addMonths(Timestamp ts, int months) {
+        return addMonths(ts, Integer.valueOf(months));
+    }
+
+    /**
+     * Oracle-compatible ADD_MONTHS implementation for Calcite internal TIMESTAMP representation.
+     *
+     * <p>Calcite may pass TIMESTAMP values as milliseconds since epoch ({@code long}/{@code Long})
+     * instead of {@link Timestamp} objects.
+     */
+    public static Timestamp addMonthsTimestamp(Object ts, Integer months) {
+        if (ts == null || months == null)
+            return null;
+
+        if (ts instanceof Timestamp)
+            return addMonths((Timestamp)ts, months);
+
+        if (ts instanceof Number)
+            return addMonthsTimestamp(((Number)ts).longValue(), months);
+
+        throw new IllegalArgumentException("Unsupported ADD_MONTHS TIMESTAMP argument type: " + ts.getClass());
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite TIMESTAMP as millis since epoch (primitive). */
+    public static Timestamp addMonthsTimestamp(long ts, int months) {
+        LocalDateTime source = LocalDateTime.of(1970, 1, 1, 0, 0).plus(ts, ChronoUnit.MILLIS);
+        LocalDate shiftedDate = addMonthsInternal(source.toLocalDate(), months);
+
+        return Timestamp.valueOf(LocalDateTime.of(shiftedDate, source.toLocalTime()));
+    }
+
+    /** Oracle-compatible ADD_MONTHS for Calcite TIMESTAMP as millis since epoch. */
+    public static Timestamp addMonthsTimestamp(long ts, Integer months) {
+        if (months == null)
+            return null;
+
+        return addMonthsTimestamp(ts, months.intValue());
+    }
+
+    /**
+     * Applies Oracle month-shift rules:
+     * if source date is month end, result is target month end;
+     * if target month is shorter than source day, result is target month end.
+     */
+    private static LocalDate addMonthsInternal(LocalDate source, int months) {
+        LocalDate target = source.plusMonths(months);
+
+        if (source.getDayOfMonth() == source.lengthOfMonth())
+            return target.withDayOfMonth(target.lengthOfMonth());
+
+        if (source.getDayOfMonth() > target.lengthOfMonth())
+            return target.withDayOfMonth(target.lengthOfMonth());
+
+        return target.withDayOfMonth(source.getDayOfMonth());
     }
 }
