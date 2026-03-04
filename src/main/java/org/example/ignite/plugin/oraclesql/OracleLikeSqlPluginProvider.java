@@ -112,16 +112,16 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 if (call.getType().getSqlTypeName() == org.apache.calcite.sql.type.SqlTypeName.TIMESTAMP) {
                     return Expressions.call(
                         SqlFunctions.class,
-                        "addMonths",
-                        Expressions.convert_(source, java.sql.Timestamp.class),
+                        "addMonthsTimestamp",
+                        source,
                         months
                     );
                 }
 
                 return Expressions.call(
                     SqlFunctions.class,
-                    "addMonths",
-                    Expressions.convert_(source, java.sql.Date.class),
+                    "addMonthsDate",
+                    source,
                     months
                 );
             }, NullPolicy.STRICT, false)
