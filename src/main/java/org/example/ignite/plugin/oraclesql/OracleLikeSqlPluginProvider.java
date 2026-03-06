@@ -169,6 +169,14 @@ public class OracleLikeSqlPluginProvider implements PluginProvider<PluginConfigu
                 NullPolicy.NONE,
                 false)
         );
+
+        RexImpTable.INSTANCE.define(
+            OracleLikeSqlOperatorTable.SYSDATE,
+            RexImpTable.createRexCallImplementor((translator, call, translatedOperands) ->
+                    Expressions.call(SqlFunctions.class, "sysdate"),
+                NullPolicy.NONE,
+                false)
+        );
     }
 
     /** {@inheritDoc} */

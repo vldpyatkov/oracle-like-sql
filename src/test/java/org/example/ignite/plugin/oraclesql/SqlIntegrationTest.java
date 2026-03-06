@@ -2,6 +2,8 @@ package org.example.ignite.plugin.oraclesql;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
@@ -97,6 +99,26 @@ public class SqlIntegrationTest {
             assertTrue(first instanceof Timestamp);
             assertTrue(second instanceof Timestamp);
             assertFalse(((Timestamp)second).before((Timestamp)first));
+        }
+    }
+
+    /** Verifies Oracle-compatible SYSDATE behavior and signature. */
+    @Test
+    public void testSysdate() {
+        try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
+            Instant before = Instant.now();
+            Object value = queryAndPrint(ignite, "SELECT SYSDATE").get(0).get(0);
+            Instant after = Instant.now();
+
+            assertNotNull(value);
+            assertTrue(value instanceof Timestamp);
+
+            Timestamp ts = (Timestamp)value;
+
+            assertEquals(0, ts.getNanos());
+            assertFalse(ts.toInstant().isBefore(before.minusSeconds(1)));
+            assertFalse(ts.toInstant().isAfter(after.plusSeconds(1)));
+            assertTrue(Duration.between(ts.toInstant(), after).abs().getSeconds() <= 1);
         }
     }
 

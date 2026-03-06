@@ -2,6 +2,7 @@ package org.example.ignite.plugin.oraclesql;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -158,6 +159,20 @@ public class SqlFunctions {
      */
     public static Timestamp systimestamp() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    /**
+     * Oracle-compatible SYSDATE implementation.
+     *
+     * <p>Oracle SYSDATE has second precision (without fractional seconds).
+     * To preserve the time component in Ignite we expose the value as TIMESTAMP,
+     * truncated to seconds.</p>
+     *
+     * @return Current timestamp truncated to seconds.
+     */
+    public static Timestamp sysdate() {
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        return Timestamp.from(now);
     }
 
     /**

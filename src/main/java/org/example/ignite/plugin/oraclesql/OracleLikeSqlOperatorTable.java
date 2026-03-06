@@ -36,6 +36,22 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         SqlFunctionCategory.TIMEDATE
     );
 
+    /**
+     * Oracle-compatible SYSDATE function.
+     *
+     * <p>In Oracle, SYSDATE returns DATE which includes time with second precision.
+     * Ignite DATE type does not keep time, so this function is exposed as TIMESTAMP(0)
+     * to preserve Oracle observable behavior for time components.</p>
+     */
+    public static final SqlFunction SYSDATE = new SqlFunction(
+        "SYSDATE",
+        SqlKind.OTHER_FUNCTION,
+        ReturnTypes.explicit(SqlTypeName.TIMESTAMP),
+        null,
+        OperandTypes.NILADIC,
+        SqlFunctionCategory.TIMEDATE
+    );
+
     /** Oracle-compatible ADD_MONTHS function. */
     public static final SqlFunction ADD_MONTHS = new SqlFunction(
         "ADD_MONTHS",
