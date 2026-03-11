@@ -3,6 +3,7 @@ package org.example.ignite.plugin.oraclesql;
 import org.apache.calcite.sql.SqlFunction;
 import org.apache.calcite.sql.SqlFunctionCategory;
 import org.apache.calcite.sql.SqlKind;
+import org.apache.calcite.sql.SqlSyntax;
 import org.apache.calcite.sql.type.OperandTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
 import org.apache.calcite.sql.type.SqlTypeFamily;
@@ -11,6 +12,20 @@ import org.apache.calcite.sql.type.SqlTypeTransforms;
 import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable;
 
 public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
+    /**
+     * Niladic function exposed with identifier-like syntax to support calls without parentheses.
+     */
+    private static class OracleNiladicIdentifierFunction extends SqlFunction {
+        OracleNiladicIdentifierFunction(String name, SqlFunctionCategory category, SqlTypeName returnType) {
+            super(name, SqlKind.OTHER_FUNCTION, ReturnTypes.explicit(returnType), null, OperandTypes.NILADIC, category);
+        }
+
+        /** {@inheritDoc} */
+        @Override public SqlSyntax getSyntax() {
+            return SqlSyntax.FUNCTION_ID;
+        }
+    }
+
     /** Oracle-compatible SUBSTR function. */
     public static final SqlFunction SUBSTR = new SqlFunction(
         "SUBSTR",
@@ -36,6 +51,10 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         SqlFunctionCategory.TIMEDATE
     );
 
+    /** Oracle-compatible SYSTIMESTAMP function with identifier-like syntax (without parentheses). */
+    public static final SqlFunction SYSTIMESTAMP_NO_PAREN =
+        new OracleNiladicIdentifierFunction("SYSTIMESTAMP", SqlFunctionCategory.TIMEDATE, SqlTypeName.TIMESTAMP);
+
     /**
      * Oracle-compatible SYSDATE function.
      *
@@ -51,6 +70,10 @@ public class OracleLikeSqlOperatorTable extends ReflectiveSqlOperatorTable {
         OperandTypes.NILADIC,
         SqlFunctionCategory.TIMEDATE
     );
+
+    /** Oracle-compatible SYSDATE function with identifier-like syntax (without parentheses). */
+    public static final SqlFunction SYSDATE_NO_PAREN =
+        new OracleNiladicIdentifierFunction("SYSDATE", SqlFunctionCategory.TIMEDATE, SqlTypeName.TIMESTAMP);
 
     /** Oracle-compatible ADD_MONTHS function. */
     public static final SqlFunction ADD_MONTHS = new SqlFunction(

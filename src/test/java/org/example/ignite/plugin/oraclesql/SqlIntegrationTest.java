@@ -91,7 +91,7 @@ public class SqlIntegrationTest {
     @Test
     public void testSystimestamp() {
         try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
-            Object first = queryAndPrint(ignite, "SELECT SYSTIMESTAMP()").get(0).get(0);
+            Object first = queryAndPrint(ignite, "SELECT SYSTIMESTAMP").get(0).get(0);
             Object second = queryAndPrint(ignite, "SELECT SYSTIMESTAMP()").get(0).get(0);
 
             assertNotNull(first);
@@ -108,10 +108,13 @@ public class SqlIntegrationTest {
         try (Ignite ignite = Ignition.start(createConfiguration("node-1"))) {
             Instant before = Instant.now();
             Object value = queryAndPrint(ignite, "SELECT SYSDATE").get(0).get(0);
+            Object valueWithParens = queryAndPrint(ignite, "SELECT SYSDATE()").get(0).get(0);
             Instant after = Instant.now();
 
             assertNotNull(value);
+            assertNotNull(valueWithParens);
             assertTrue(value instanceof Timestamp);
+            assertTrue(valueWithParens instanceof Timestamp);
 
             Timestamp ts = (Timestamp)value;
 
